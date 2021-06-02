@@ -1,7 +1,6 @@
 package br.com.marcello.SocialMeli.dtos.sellers;
 
-import br.com.marcello.SocialMeli.dtos.buyers.BuyerDto;
-import br.com.marcello.SocialMeli.model.Buyer;
+import br.com.marcello.SocialMeli.dtos.user.UserDto;
 
 import java.util.List;
 
@@ -9,7 +8,7 @@ public class GetFollowersListResponse {
 
     private Integer userId;
     private String username;
-    private List<BuyerDto> followers;
+    private List<UserDto> followers;
 
     public Integer getUserId() {
         return userId;
@@ -27,11 +26,11 @@ public class GetFollowersListResponse {
         this.username = username;
     }
 
-    public List<BuyerDto> getFollowers() {
+    public List<UserDto> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<BuyerDto> followers) {
+    public void setFollowers(List<UserDto> followers) {
         this.followers = followers;
     }
 }

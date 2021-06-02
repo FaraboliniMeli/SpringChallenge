@@ -9,4 +9,6 @@ public interface SellerUtils {
 
     List<SellerDto> convertEntityToDto(List<Seller> sellerList);
 
+    SellerDto convertEntityToDto(Seller seller);
+
 }

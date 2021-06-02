@@ -1,7 +1,6 @@
-package br.com.marcello.SocialMeli.dtos.buyers;
+package br.com.marcello.SocialMeli.dtos.user;
 
 import br.com.marcello.SocialMeli.dtos.sellers.SellerDto;
-import br.com.marcello.SocialMeli.model.Seller;
 
 import java.util.List;
 
@@ -34,4 +33,5 @@ public class GetFollowingListResponse {
     public void setFollowed(List<SellerDto> followed) {
         this.followed = followed;
     }
+
 }

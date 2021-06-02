@@ -11,6 +11,14 @@ import java.util.List;
 public class SellerUtilsImpl implements SellerUtils {
 
     @Override
+    public SellerDto convertEntityToDto(Seller seller) {
+        SellerDto sellerDto = new SellerDto();
+        sellerDto.setUsername(seller.getUsername());
+        sellerDto.setUserId(seller.getUserId());
+        return sellerDto;
+    }
+
+    @Override
     public List<SellerDto> convertEntityToDto(List<Seller> sellerList) {
         List<SellerDto> sellerDtoList = new ArrayList<>();
         for(Seller seller : sellerList) {

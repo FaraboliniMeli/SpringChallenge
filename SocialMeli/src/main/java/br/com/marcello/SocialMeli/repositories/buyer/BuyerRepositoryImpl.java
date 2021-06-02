@@ -1,9 +1,13 @@
 package br.com.marcello.SocialMeli.repositories.buyer;
 
+import br.com.marcello.SocialMeli.controllers.SellerController;
 import br.com.marcello.SocialMeli.dtos.buyers.BuyerDto;
+import br.com.marcello.SocialMeli.dtos.sellers.SellerDto;
 import br.com.marcello.SocialMeli.model.Buyer;
 import br.com.marcello.SocialMeli.model.Seller;
+import br.com.marcello.SocialMeli.repositories.seller.SellerRepository;
 import br.com.marcello.SocialMeli.repositories.users.UserRepository;
+import br.com.marcello.SocialMeli.utils.seller.SellerUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
@@ -13,7 +17,9 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class BuyerRepositoryImpl implements BuyerRepository {
@@ -21,18 +27,50 @@ public class BuyerRepositoryImpl implements BuyerRepository {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SellerUtils sellerUtils;
+
     private final String jsonPath = "./src/main/java/br/com/marcello/SocialMeli/json/buyers.json";
 
     @Override
-    public void addFollow(Seller seller, Integer buyerId) {
+    public List<SellerDto> orderFollowingListByNameDesc(List<SellerDto> followingList) {
+        return followingList.stream()
+                .sorted(Comparator.comparing(SellerDto::getUsername).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SellerDto> orderFollowingListByNameAsc(List<SellerDto> followingList) {
+        return followingList.stream()
+                .sorted(Comparator.comparing(SellerDto::getUsername))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean unfollow(Integer userId, Integer unfollowUserId) {
         List<Buyer> buyerList = this.initJsonRepo();
 
-        buyerList.stream()
-                .filter(buyer -> buyer.getUserId().equals(buyerId))
+        boolean removed = buyerList.stream()
+                .filter(buyer -> buyer.getUserId().equals(userId))
                 .findFirst()
                 .orElse(null)
                 .getFollowingList()
-                .add(seller);
+                .removeIf(sellerDto -> sellerDto.getUserId().equals(unfollowUserId));
+
+        this.writeOnJsonFile(buyerList);
+        return removed;
+    }
+
+    @Override
+    public void addFollow(Seller seller, Integer userId) {
+        List<Buyer> buyerList = this.initJsonRepo();
+
+        buyerList.stream()
+                .filter(buyer -> buyer.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null)
+                .getFollowingList()
+                .add(this.sellerUtils.convertEntityToDto(seller));
 
         this.writeOnJsonFile(buyerList);
     }

@@ -1,12 +1,14 @@
 package br.com.marcello.SocialMeli.model;
 
+import br.com.marcello.SocialMeli.dtos.sellers.SellerDto;
+
 import java.util.List;
 
 public class Buyer {
 
     private Integer userId;
     private String username;
-    private List<Seller> followingList;
+    private List<SellerDto> followingList;
 
     public Integer getUserId() {
         return userId;
@@ -24,11 +26,11 @@ public class Buyer {
         this.username = username;
     }
 
-    public List<Seller> getFollowingList() {
+    public List<SellerDto> getFollowingList() {
         return followingList;
     }
 
-    public void setFollowingList(List<Seller> followingList) {
+    public void setFollowingList(List<SellerDto> followingList) {
         this.followingList = followingList;
     }
 }
