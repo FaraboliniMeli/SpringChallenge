@@ -1,19 +1,31 @@
-package br.com.marcello.SocialMeli.model;
+package br.com.marcello.SocialMeli.dtos.post;
 
+import br.com.marcello.SocialMeli.model.Product;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public class Post {
+public class PromoPostDto {
 
+    private Integer userId;
     private Integer postId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate date;
+
     private Product detail;
     private Integer category;
     private Double price;
     private Boolean hasPromo;
     private Double discount;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public Integer getPostId() {
         return postId;

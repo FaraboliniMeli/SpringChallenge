@@ -5,8 +5,8 @@ import br.com.marcello.SocialMeli.dtos.errors.NoPostsLastTwoWeeksResponse;
 import br.com.marcello.SocialMeli.dtos.errors.PostBadRequest;
 import br.com.marcello.SocialMeli.dtos.errors.UserNotFoundResponse;
 import br.com.marcello.SocialMeli.dtos.post.PostDto;
-import br.com.marcello.SocialMeli.dtos.responses.SuccessPost;
-import br.com.marcello.SocialMeli.dtos.responses.TwoWeeksPostsResponse;
+import br.com.marcello.SocialMeli.dtos.post.PromoPostDto;
+import br.com.marcello.SocialMeli.dtos.responses.*;
 import br.com.marcello.SocialMeli.dtos.sellers.SellerDto;
 import br.com.marcello.SocialMeli.model.Post;
 import br.com.marcello.SocialMeli.model.Seller;
@@ -41,14 +41,13 @@ public class PostController {
 
     @PostMapping("/newpost")
     public ResponseEntity<?> makeNewPost(@RequestBody PostDto postDto) {
-        if(this.userRepositoryImpl.findById(postDto.getUserId()).getUserType().equals(UserType.BUYER))
-            return new ResponseEntity<>(new PostBadRequest(), HttpStatus.BAD_REQUEST);
-
         Integer sellerId = postDto.getUserId();
-        Seller seller = this.sellerRepositoryImpl.findById(sellerId);
 
-        if(seller == null)
+        if(!this.userExists(sellerId))
             return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
+
+        if(this.isBuyer(sellerId))
+            return new ResponseEntity<>(new PostBadRequest(), HttpStatus.BAD_REQUEST);
 
         Post post = this.postUtilsImpl.convertDtoToEntity(postDto);
         this.sellerRepositoryImpl.makeNewPost(post, sellerId);
@@ -59,13 +58,12 @@ public class PostController {
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<?> getTwoWeeksPosts(@PathVariable String userId) {
         Integer integerUserId = Integer.parseInt(userId);
-        User user = this.userRepositoryImpl.findById(integerUserId);
         List<SellerDto> followedSellers = null;
 
-        if(user == null)
+        if(!this.userExists(integerUserId))
             return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
 
-        if(user.getUserType().equals(UserType.BUYER)) {
+        if(this.isBuyer(integerUserId)) {
             followedSellers = this.buyerRepositoryImpl.findById(integerUserId)
                     .getFollowingList();
         } else {
@@ -88,13 +86,12 @@ public class PostController {
     @GetMapping("/followed/{userId}/orderedList")
     public ResponseEntity<?> getTwoWeeksPosts(@PathVariable String userId, @RequestParam(value = "order") String order) {
         Integer integerUserId = Integer.parseInt(userId);
-        User user = this.userRepositoryImpl.findById(integerUserId);
         List<SellerDto> followedSellers = null;
 
-        if(user == null)
+        if(!this.userExists(integerUserId))
             return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
 
-        if(user.getUserType().equals(UserType.BUYER)) {
+        if(this.isBuyer(integerUserId)) {
             followedSellers = this.buyerRepositoryImpl.findById(integerUserId)
                     .getFollowingList();
         } else {
@@ -119,6 +116,78 @@ public class PostController {
         postsResponse.setPosts(twoWeeksPostList);
 
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/newPromoPost")
+    public ResponseEntity<?> makeNewPromoPost(@RequestBody PromoPostDto promoPostDto) {
+        Integer sellerId = promoPostDto.getUserId();
+
+        if(!this.userExists(sellerId))
+            return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
+
+        if(this.isBuyer(sellerId))
+            return new ResponseEntity<>(new PostBadRequest(), HttpStatus.BAD_REQUEST);
+
+        Post post = this.postUtilsImpl.convertDtoToEntity(promoPostDto);
+        this.sellerRepositoryImpl.makeNewPost(post, sellerId);
+
+        return new ResponseEntity<>(new SuccessPost(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}/countPromo")
+    public ResponseEntity<?> getPromoPostCount(@PathVariable String userId) {
+        Integer sellerId = Integer.parseInt(userId);
+
+        if(!this.userExists(sellerId))
+            return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
+
+        if(this.isBuyer(sellerId))
+            return new ResponseEntity<>(new PostBadRequest(), HttpStatus.BAD_REQUEST);
+
+        Seller seller = this.sellerRepositoryImpl.findById(sellerId);
+        Integer countPromo = this.sellerRepositoryImpl.countPromoPostList(sellerId);
+
+        if(countPromo == 0)
+            return new ResponseEntity<>(new NoPromoPostResponse(), HttpStatus.NOT_FOUND);
+
+        CountPromoPostResponse countPromoResponse = new CountPromoPostResponse();
+        countPromoResponse.setUserId(seller.getUserId());
+        countPromoResponse.setUsername(seller.getUsername());
+        countPromoResponse.setPromoProductsCount(countPromo);
+
+        return new ResponseEntity<>(countPromoResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}/list")
+    public ResponseEntity<?> getPromoPostList(@PathVariable String userId) {
+        Integer sellerId = Integer.parseInt(userId);
+
+        if(!this.userExists(sellerId))
+            return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
+
+        if(this.isBuyer(sellerId))
+            return new ResponseEntity<>(new PostBadRequest(), HttpStatus.BAD_REQUEST);
+
+        Seller seller = this.sellerRepositoryImpl.findById(sellerId);
+        List<Post> promoPostList = this.sellerRepositoryImpl.listPromoPost(sellerId);
+
+        if(promoPostList.size() == 0)
+            return new ResponseEntity<>(new NoPromoPostResponse(), HttpStatus.NOT_FOUND);
+
+        PromoPostResponse promoPostResponse = new PromoPostResponse();
+        promoPostResponse.setUserId(seller.getUserId());
+        promoPostResponse.setUsername(seller.getUsername());
+        promoPostResponse.setPromoPosts(promoPostList);
+
+        return new ResponseEntity<>(promoPostResponse, HttpStatus.OK);
+    }
+
+    private Boolean userExists(Integer userId) {
+        return this.userRepositoryImpl.findById(userId) != null;
+    }
+
+    private Boolean isBuyer(Integer userId) {
+        return this.userRepositoryImpl.findById(userId).getUserType().equals(UserType.BUYER);
     }
 
 }

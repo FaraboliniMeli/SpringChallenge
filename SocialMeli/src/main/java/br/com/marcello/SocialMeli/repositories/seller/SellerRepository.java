@@ -10,6 +10,10 @@ import java.util.List;
 
 public interface SellerRepository {
 
+    List<Post> listPromoPost(Integer sellerId);
+
+    Integer countPromoPostList(Integer sellerId);
+
     List<Post> orderPostListByDateAsc(List<Post> postList);
 
     List<Post> orderPostListByDateDesc(List<Post> postList);

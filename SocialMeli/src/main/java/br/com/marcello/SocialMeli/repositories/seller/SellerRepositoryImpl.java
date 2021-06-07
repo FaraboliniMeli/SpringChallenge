@@ -36,6 +36,35 @@ public class SellerRepositoryImpl implements SellerRepository {
     private final String jsonPath = "./src/main/java/br/com/marcello/SocialMeli/json/sellers.json";
 
     @Override
+    public List<Post> listPromoPost(Integer sellerId) {
+        List<Seller> sellerList = this.initJsonRepo();
+
+        return sellerList.stream()
+                .filter(seller -> seller.getUserId().equals(sellerId))
+                .findFirst()
+                .orElse(null)
+                .getPostList()
+                .stream()
+                .filter(post -> post.getHasPromo())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer countPromoPostList(Integer sellerId) {
+        List<Seller> sellerList = this.initJsonRepo();
+
+        return sellerList.stream()
+                .filter(seller -> seller.getUserId().equals(sellerId))
+                .findFirst()
+                .orElse(null)
+                .getPostList()
+                .stream()
+                .filter(post -> post.getHasPromo())
+                .collect(Collectors.toList())
+                .size();
+    }
+
+    @Override
     public List<Post> orderPostListByDateAsc(List<Post> postList) {
         return this.sortByAscPostDate(postList);
     }
