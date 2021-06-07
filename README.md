@@ -203,7 +203,7 @@ Com as seguintes possibilidades de ordenação:
 
 Recebe como parâmetro um ID de usuário que deseja deixar de seguir um vendedor, e o ID desse vendedor que receberá um unfollow.
 
-### Postar um produto em promoção
+### Postar um produto em promoção (POST)
 
 * http://localhost:8080/products/newPromoPost
 
@@ -227,7 +227,7 @@ Permite que o vendedor faça um post de um produto que entrou em promoção e in
     "price": 199.99
 }
 
-### Quantos produtos o vendedor tem em promoção?
+### Quantos produtos o vendedor tem em promoção? (GET)
 
 * http://localhost:8080/products/{userId}/countPromo
 
@@ -239,7 +239,7 @@ Recebe como parâmetro o ID do vendedor e retorna um JSON contendo quantos produ
 	"promoProductsCount": 15
 }
 
-### Posts de produtos em promoção
+### Posts de produtos em promoção (GET)
 
 * http://localhost:8080/products/{userId}/list
 
