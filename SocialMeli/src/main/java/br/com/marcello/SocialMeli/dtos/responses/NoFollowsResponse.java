@@ -1,11 +1,11 @@
 package br.com.marcello.SocialMeli.dtos.responses;
 
-public class NotFollowingResponse {
+public class NoFollowsResponse {
 
     private String message;
 
-    public NotFollowingResponse() {
-        this.message = "Impossible to unfollow. You don't follow this seller";
+    public NoFollowsResponse() {
+        this.message = "You don't follow anyone.";
     }
 
     public String getMessage() {

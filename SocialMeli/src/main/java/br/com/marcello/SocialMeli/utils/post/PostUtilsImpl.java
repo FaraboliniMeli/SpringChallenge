@@ -30,6 +30,8 @@ public class PostUtilsImpl implements PostUtils {
         post.setDetail(postDto.getDetail());
         post.setCategory(postDto.getCategory());
         post.setPrice(postDto.getPrice());
+        post.setHasPromo(false);
+        post.setDiscount(0.);
 
         return post;
     }

@@ -36,6 +36,18 @@ public class SellerRepositoryImpl implements SellerRepository {
     private final String jsonPath = "./src/main/java/br/com/marcello/SocialMeli/json/sellers.json";
 
     @Override
+    public Boolean alreadyFollows(Integer userId, Integer userIdToFollow) {
+        Seller seller = this.findById(userId);
+
+        SellerDto sellerToFollow = seller.getFollowingList().stream()
+                .filter(s -> s.getUserId().equals(userIdToFollow))
+                .findFirst()
+                .orElse(null);
+
+        return sellerToFollow != null;
+    }
+
+    @Override
     public List<Post> listPromoPost(Integer sellerId) {
         List<Seller> sellerList = this.initJsonRepo();
 
@@ -45,7 +57,7 @@ public class SellerRepositoryImpl implements SellerRepository {
                 .orElse(null)
                 .getPostList()
                 .stream()
-                .filter(post -> post.getHasPromo())
+                .filter(Post::getHasPromo)
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +71,7 @@ public class SellerRepositoryImpl implements SellerRepository {
                 .orElse(null)
                 .getPostList()
                 .stream()
-                .filter(post -> post.getHasPromo())
+                .filter(Post::getHasPromo)
                 .collect(Collectors.toList())
                 .size();
     }
@@ -100,6 +112,20 @@ public class SellerRepositoryImpl implements SellerRepository {
         return followerList.stream()
                 .sorted(Comparator.comparing(UserDto::getUsername))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void removeFollow(Integer userId, Integer sellerId) {
+        List<Seller> sellerList = this.initJsonRepo();
+
+        sellerList.stream()
+                .filter(seller -> seller.getUserId().equals(sellerId))
+                .findFirst()
+                .orElse(null)
+                .getFollowerList()
+                .removeIf(user -> user.getUserId().equals(userId));
+
+        this.writeOnJsonFile(sellerList);
     }
 
     @Override

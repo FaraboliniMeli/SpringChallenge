@@ -7,6 +7,11 @@ import java.util.List;
 
 public interface BuyerUtils {
 
+    /**
+     * Converts a List of Entity Buyer to a List of BuyerDto
+     * @param buyerList
+     * @return buyerDtoList
+     */
     List<BuyerDto> convertEntityToDto(List<Buyer> buyerList);
 
 }

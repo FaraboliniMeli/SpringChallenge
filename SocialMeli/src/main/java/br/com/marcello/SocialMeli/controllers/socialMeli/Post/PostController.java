@@ -58,11 +58,11 @@ public class PostController {
     @GetMapping("/followed/{userId}/list")
     public ResponseEntity<?> getTwoWeeksPosts(@PathVariable String userId) {
         Integer integerUserId = Integer.parseInt(userId);
-        List<SellerDto> followedSellers = null;
 
         if(!this.userExists(integerUserId))
             return new ResponseEntity<>(new UserNotFoundResponse(), HttpStatus.NOT_FOUND);
 
+        List<SellerDto> followedSellers = null;
         if(this.isBuyer(integerUserId)) {
             followedSellers = this.buyerRepositoryImpl.findById(integerUserId)
                     .getFollowingList();

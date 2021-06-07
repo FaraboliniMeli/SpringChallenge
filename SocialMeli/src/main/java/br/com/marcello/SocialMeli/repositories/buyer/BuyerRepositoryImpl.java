@@ -5,6 +5,7 @@ import br.com.marcello.SocialMeli.dtos.buyers.BuyerDto;
 import br.com.marcello.SocialMeli.dtos.sellers.SellerDto;
 import br.com.marcello.SocialMeli.model.Buyer;
 import br.com.marcello.SocialMeli.model.Seller;
+import br.com.marcello.SocialMeli.model.User;
 import br.com.marcello.SocialMeli.repositories.seller.SellerRepository;
 import br.com.marcello.SocialMeli.repositories.users.UserRepository;
 import br.com.marcello.SocialMeli.utils.seller.SellerUtils;
@@ -31,6 +32,18 @@ public class BuyerRepositoryImpl implements BuyerRepository {
     private SellerUtils sellerUtils;
 
     private final String jsonPath = "./src/main/java/br/com/marcello/SocialMeli/json/buyers.json";
+
+    @Override
+    public Boolean alreadyFollows(Integer userId, Integer userIdToFollow) {
+        Buyer buyer = this.findById(userId);
+
+        SellerDto sellerToFollow = buyer.getFollowingList().stream()
+                .filter(b -> b.getUserId().equals(userIdToFollow))
+                .findFirst()
+                .orElse(null);
+
+        return sellerToFollow != null;
+    }
 
     @Override
     public List<SellerDto> orderFollowingListByNameDesc(List<SellerDto> followingList) {
